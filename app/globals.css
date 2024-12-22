@@ -4,6 +4,11 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-color: #e8f9ea;
+  background-image: url("/fingerprint.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 @layer base {
@@ -69,4 +74,12 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.button {
+  background-color: #2c2d30;
+}
+
+.button:hover {
+  background-color: #3a3a3a;
 }
