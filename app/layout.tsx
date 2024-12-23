@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/Header";
+import { Header } from "@/components/layout/Header";
+import { Wallet } from "@/components/wallet/WalletProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -10,8 +11,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "ZkSign",
-  description: "ZkSign app",
+  title: "zkSign",
+  description: "zkSign app",
 };
 
 export default function RootLayout({
@@ -25,8 +26,10 @@ export default function RootLayout({
         className={`${poppins.variable} antialiased`}
         cz-shortcut-listen="true"
       >
-        <Header />
-        {children}
+        <Wallet>
+          <Header />
+          {children}
+        </Wallet>
       </body>
     </html>
   );
