@@ -19,7 +19,7 @@ import IpfsDocumentViewer from "@/components/ipfsviewer/IpfsDocumentViewer";
 import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
 
 export default function Dashboard() {
-  const { publicKey } = useWallet();
+  const { publicKey, connected } = useWallet();
   return (
     <div className="max-w-5xl mx-auto p-14 space-y-6">
       {/* Header Stats */}
@@ -43,14 +43,14 @@ export default function Dashboard() {
               <DollarSignIcon width={45} height={45} />
               <div>
                 <h2 className="font-semibold">ALEO</h2>
-                <p className="text-xl">100</p>
+                <p className="text-xl">{connected ? "100" : "N/A"}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <FingerprintIcon width={45} height={45} />
               <div>
                 <h2 className="font-semibold">SIGN</h2>
-                <p className="text-xl">0</p>
+                <p className="text-xl">{connected ? "0" : "N/A"}</p>
               </div>
             </div>
           </div>

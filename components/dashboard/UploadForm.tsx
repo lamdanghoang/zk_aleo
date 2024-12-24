@@ -30,27 +30,30 @@ export default function ContractUploadForm() {
     base64: "",
   });
   const [base64Result, setBase64Result] = useState<string>("");
+  const [isError, setIsError] = useState<boolean | undefined>(undefined);
 
   const uploadData = async (formData: FormData) => {
     try {
-      const response = await fetch("http://zksign-dev.vercel.app/upload", {
+      const response = await fetch("https://zksign-dev.vercel.app/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           file: formData.base64,
           viewkey: formData.viewKey,
         }),
-        mode: "no-cors",
       });
 
       if (!response.ok) {
+        setIsError(true);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       console.log("Upload successful:", data);
+      setIsError(false);
       return data;
     } catch (error) {
       console.error("Error when uploading:", error);
@@ -190,6 +193,28 @@ export default function ContractUploadForm() {
             </CardFooter>
           </form>
         </Card>
+        {isError === false && (
+          <Alert className="flex justify-between items-center">
+            <AlertTitle>Your submission is complete !</AlertTitle>
+            <button
+              onClick={() => setIsError(undefined)}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              ✕
+            </button>
+          </Alert>
+        )}
+        {isError === true && (
+          <Alert className="flex justify-between items-center">
+            <AlertTitle>An error occurred ! Try again later !</AlertTitle>
+            <button
+              onClick={() => setIsError(undefined)}
+              className="p-2 hover:bg-gray-100 rounded-full"
+            >
+              ✕
+            </button>
+          </Alert>
+        )}
       </div>
     </div>
   );

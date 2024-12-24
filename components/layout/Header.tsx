@@ -27,10 +27,10 @@ export function Header() {
           <span className="font-semibold text-xl">zkSign</span>
         </Link>
         <div className="flex items-center gap-4">
-          <div className="px-3 py-2 flex items-center gap-2 border rounded-2xl bg-white">
+          {/* <div className="px-3 py-2 flex items-center gap-2 border rounded-2xl bg-white">
             <Wallet className="h-4 w-4" />
             <span>0</span>
-          </div>
+          </div> */}
           <div className="px-3 py-2 flex items-center gap-2 border rounded-3xl bg-white">
             <Image
               src={"secondary-icon-dark.svg"}
