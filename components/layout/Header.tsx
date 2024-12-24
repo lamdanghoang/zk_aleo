@@ -1,6 +1,5 @@
 "use client";
 
-import { getBalance } from "@/utils/aleo_functions";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import { WalletMultiButton } from "@demox-labs/aleo-wallet-adapter-reactui";
 import { Wallet, FingerprintIcon } from "lucide-react";

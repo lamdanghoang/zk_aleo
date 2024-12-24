@@ -1,15 +1,6 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TableComponent from "@/components/dashboard/TableComponent";
 
 export default function History() {
   return (
@@ -24,17 +15,17 @@ export default function History() {
               MINTED eCONTRACTS
             </TabsTrigger>
             <TabsTrigger
-              value="received"
+              value="pending"
               className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow:none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-6 py-3"
             >
-              RECEIVED eCONTRACTS
+              PENDING eCONTRACTS
             </TabsTrigger>
-            <TabsTrigger
+            {/* <TabsTrigger
               value="sent"
               className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow:none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-6 py-3"
             >
               SENT eCONTRACTS
-            </TabsTrigger>
+            </TabsTrigger> */}
             <TabsTrigger
               value="completed"
               className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow:none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-6 py-3"
@@ -43,16 +34,16 @@ export default function History() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="minted" className="m-0">
-            <TableComponent />
+            <TableComponent data={minted_list} />
           </TabsContent>
-          <TabsContent value="received" className="m-0">
-            <TableComponent />
+          <TabsContent value="pending" className="m-0">
+            <TableComponent data={pending_list} />
           </TabsContent>
-          <TabsContent value="sent" className="m-0">
+          {/* <TabsContent value="sent" className="m-0">
             <TableComponent />
-          </TabsContent>
+          </TabsContent> */}
           <TabsContent value="completed" className="m-0">
-            <TableComponent />
+            <TableComponent data={complete_list} />
           </TabsContent>
         </Tabs>
       </CardContent>
@@ -60,28 +51,51 @@ export default function History() {
   );
 }
 
-function TableComponent() {
-  return (
-    <div className="px-5">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="font-bold text-lg">NFD ID</TableHead>
-            <TableHead className="font-bold text-lg">eContract Name</TableHead>
-            <TableHead className="font-bold text-lg">Creation Date</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>{/* Empty state shown by default */}</TableBody>
-      </Table>
-      <div className="flex items-center justify-center gap-4 p-4 border-t">
-        <Button variant="ghost" size="icon" disabled>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span>1</span>
-        <Button variant="ghost" size="icon" disabled>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
-  );
-}
+const minted_list = [
+  {
+    nfdId: "QmTvpxkqWhoP5Nuqpw9GCwZa2q1Tt2qrw7ikc1toopJ3q2",
+    eContractName: "My Leofi",
+    creationDate: "24/12/2024",
+  },
+  {
+    nfdId: "QmcxerZCr21F1zN97NifdYfJjpNay8vpf17wkt9E2a3Ngo",
+    eContractName: "My Bear",
+    creationDate: "23/12/2024",
+  },
+  {
+    nfdId: "QmNWTAK5M3GRx8R94NXsJA1n15GzkcrbmUA3t3gJyotNAw",
+    eContractName: "My Big Bear",
+    creationDate: "22/12/2024",
+  },
+  {
+    nfdId: "QmPfxSoDiwQX3Kb6UyEahKdP3UnyqHB6bcgrDJrY61v67X",
+    eContractName: "My Ox",
+    creationDate: "21/12/2024",
+  },
+  {
+    nfdId: "QmZ7C2jnE5T2WBRejhPExgitfwbQFpyVLo2zcXfamVpnbF",
+    eContractName: "My Cow",
+    creationDate: "20/12/2024",
+  },
+];
+
+const pending_list = [
+  {
+    nfdId: "QmcxerZCr21F1zN97NifdYfJjpNay8vpf17wkt9E2a3Ngo",
+    eContractName: "My Bear",
+    creationDate: "23/12/2024",
+  },
+  {
+    nfdId: "QmNWTAK5M3GRx8R94NXsJA1n15GzkcrbmUA3t3gJyotNAw",
+    eContractName: "My Big Bear",
+    creationDate: "22/12/2024",
+  },
+];
+
+const complete_list = [
+  {
+    nfdId: "QmTvpxkqWhoP5Nuqpw9GCwZa2q1Tt2qrw7ikc1toopJ3q2",
+    eContractName: "My Leofi",
+    creationDate: "24/12/2024",
+  },
+];

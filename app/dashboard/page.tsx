@@ -15,18 +15,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import History from "@/components/dashboard/HistoryTable";
 import UploadForm from "@/components/dashboard/UploadForm";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
+import IpfsDocumentViewer from "@/components/ipfsviewer/IpfsDocumentViewer";
+import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
 
 export default function Dashboard() {
   const { publicKey } = useWallet();
   return (
     <div className="max-w-5xl mx-auto p-14 space-y-6">
       {/* Header Stats */}
-      <div className="flex items-center justify-center gap-2">
-        <WalletCardsIcon width={28} height={28} />
-        <h1 className="text-2xl">Your Wallet</h1>
-      </div>
       <Card>
-        <CardContent className="py-8">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-center gap-2">
+            <WalletCardsIcon width={28} height={28} />
+            <h1 className="text-2xl">Your Wallet</h1>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pb-8">
           <div className="flex items-center justify-around">
             <div className="flex items-center gap-4">
               <Wallet width={45} height={45} />
@@ -56,7 +60,7 @@ export default function Dashboard() {
       {/* Notification */}
       <Alert
         variant="destructive"
-        className="flex items-center justify-between"
+        className="flex items-center justify-between bg-card"
       >
         <div className="flex gap-2">
           <AlertCircle className="h-4 w-4" />
