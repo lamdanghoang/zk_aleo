@@ -7,16 +7,16 @@ export default function History() {
     <Card>
       <CardContent className="p-0">
         <Tabs defaultValue="minted" className="w-full">
-          <TabsList className="w-full justify-start rounded-none h-auto flex-wrap">
+          <TabsList className="w-full justify-start rounded-none h-auto flex-wrap gap-1 p-1 sm:p-0">
             <TabsTrigger
               value="minted"
-              className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow:none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-6 py-3"
+              className="flex-1 min-w-[140px] text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-2 sm:px-6 py-2 sm:py-3"
             >
               MINTED eCONTRACTS
             </TabsTrigger>
             <TabsTrigger
               value="pending"
-              className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow:none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-6 py-3"
+              className="flex-1 min-w-[140px] text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-2 sm:px-6 py-2 sm:py-3"
             >
               PENDING eCONTRACTS
             </TabsTrigger>
@@ -28,7 +28,7 @@ export default function History() {
             </TabsTrigger> */}
             <TabsTrigger
               value="completed"
-              className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow:none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-6 py-3"
+              className="flex-1 min-w-[140px] text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-500 data-[state=active]:pb-2.5 data-[state=active]:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none px-2 sm:px-6 py-2 sm:py-3"
             >
               COMPLETED eCONTRACTS
             </TabsTrigger>

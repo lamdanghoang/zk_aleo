@@ -156,11 +156,13 @@ export default function ContractUploadForm() {
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-8 h-8 mb-3 text-gray-400" />
                       <p className="mb-2 text-sm text-gray-500">
-                        <span className="font-semibold">Click to upload</span>{" "}
-                        or drag and drop
+                        Click to <span className="font-semibold">upload</span>{" "}
+                        or <span className="font-semibold">drag</span> and{" "}
+                        <span className="font-semibold">drop</span>
                       </p>
                       <p className="text-xs text-gray-500">
-                        PDF, DOC, DOCX, PNG, SVG,... (MAX. 10MB)
+                        PDF, DOC, DOCX, PNG, SVG,... <br />
+                        (MAX. 10MB)
                       </p>
                     </div>
                     <Input
