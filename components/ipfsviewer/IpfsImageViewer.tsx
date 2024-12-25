@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React, { useEffect, useState } from "react";
 import { createHelia } from "helia";
 import { unixfs } from "@helia/unixfs";

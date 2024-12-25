@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";

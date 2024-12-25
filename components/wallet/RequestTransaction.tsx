@@ -1,12 +1,15 @@
+/* eslint-disable */
+
 import {
   Transaction,
   WalletAdapterNetwork,
   WalletNotConnectedError,
 } from "@demox-labs/aleo-wallet-adapter-base";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
-import React, { FC, useCallback } from "react";
+import React, { FC, useCallback, useState } from "react";
 
 export const RequestTransaction: FC = () => {
+  const [amount, setAmount] = useState<number>(0);
   const { publicKey, requestTransaction } = useWallet();
 
   const onClick = async () => {

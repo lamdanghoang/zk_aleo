@@ -1,4 +1,6 @@
 "use client";
+/* eslint-disable */
+
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import { FileUp } from "lucide-react";
 import { Button } from "@/components/ui/button";

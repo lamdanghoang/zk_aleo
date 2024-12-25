@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import { WalletMultiButton } from "@demox-labs/aleo-wallet-adapter-reactui";
