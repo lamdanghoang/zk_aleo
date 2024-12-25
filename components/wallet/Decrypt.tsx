@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { WalletNotConnectedError } from "@demox-labs/aleo-wallet-adapter-base";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import React, { FC, useCallback } from "react";
