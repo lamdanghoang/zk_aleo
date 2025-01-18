@@ -27,7 +27,7 @@ export const Wallet: React.FC<Props> = ({ children }) => {
     <WalletProvider
       wallets={wallets}
       decryptPermission={DecryptPermission.UponRequest}
-      network={WalletAdapterNetwork.MainnetBeta}
+      network={WalletAdapterNetwork.TestnetBeta}
       autoConnect={false}
     >
       <WalletModalProvider>{children}</WalletModalProvider>

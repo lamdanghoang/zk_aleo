@@ -1,5 +1,5 @@
 // The 'zksignleofi' program.
-program zksignleofi.aleo {
+program zksignaleov1.aleo {
     struct String64 {
         part0: u128,
         part1: u128,
