@@ -24,30 +24,34 @@ import {
   WalletAdapterNetwork,
   WalletNotConnectedError,
 } from "@demox-labs/aleo-wallet-adapter-base";
+import { useBalance } from "@puzzlehq/sdk";
 
 export default function Dashboard() {
   const { publicKey, connected, requestTransaction } = useWallet();
 
   const handleSign = async (e: any) => {
     if (!publicKey || !requestTransaction) {
-      console.log("Undefine key aleo")
-      return
+      console.log("Undefine key aleo");
+      return;
     }
-    
-    const fee = 1000000; 
-    let inputs =  [ "aleo10qwt04dklqyclh9wfqj76npzckfv6lvvpad20rta0gjlvdlxgq8sf07d6x", '2411u128' ];
+
+    const fee = 350_000;
+    let inputs = [
+      "aleo10qwt04dklqyclh9wfqj76npzckfv6lvvpad20rta0gjlvdlxgq8sf07d6x",
+      "2411u128",
+    ];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
       WalletAdapterNetwork.TestnetBeta,
-      'zksignaleov1.aleo',
-      'create_document',
+      "zksignaleov1.aleo",
+      "create_document",
       inputs,
       fee,
       false
     );
     const txid = await requestTransaction(aleoTransaction);
     console.log(txid);
-  };  
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-8 md:p-14 space-y-6">
@@ -75,7 +79,7 @@ export default function Dashboard() {
               <div>
                 <h2 className="font-semibold text-xs sm:text-base">ALEO</h2>
                 <p className="text-base sm:text-xl">
-                  {connected ? "100" : "N/A"}
+                  {connected ? "10" : "N/A"}
                 </p>
               </div>
             </div>
@@ -104,7 +108,12 @@ export default function Dashboard() {
             eContracts.
           </AlertDescription>
         </div>
-        <Button onClick={handleSign} variant="destructive" size="sm" className="w-full sm:w-auto">
+        <Button
+          onClick={handleSign}
+          variant="destructive"
+          size="sm"
+          className="w-full sm:w-auto"
+        >
           OPT-IN
         </Button>
       </Alert>

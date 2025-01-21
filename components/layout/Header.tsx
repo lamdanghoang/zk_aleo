@@ -1,25 +1,12 @@
 "use client";
 /* eslint-disable */
 
-import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
-import { WalletMultiButton } from "@demox-labs/aleo-wallet-adapter-reactui";
+import { WalletMultiButton } from "@/components/wallet/CustomWalletMultiBtn";
 import { Wallet, FingerprintIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export function Header() {
-  const { connected, publicKey } = useWallet();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (connected) {
-      console.log(publicKey);
-      router.push("/dashboard");
-    }
-  }, [connected, router]);
-
   return (
     <header className="max-w-5xl mx-auto mt-6 sticky top-6 z-50 w-full px-4 border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-3xl">
       <div className="flex h-14 items-center justify-between">

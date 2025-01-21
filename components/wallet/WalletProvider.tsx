@@ -8,6 +8,7 @@ import {
   WalletAdapterNetwork,
 } from "@demox-labs/aleo-wallet-adapter-base";
 import "./styles.css";
+import { PuzzleWalletProvider } from "@puzzlehq/sdk";
 
 interface Props {
   children: React.ReactNode;
@@ -30,7 +31,16 @@ export const Wallet: React.FC<Props> = ({ children }) => {
       network={WalletAdapterNetwork.TestnetBeta}
       autoConnect={false}
     >
-      <WalletModalProvider>{children}</WalletModalProvider>
+      <WalletModalProvider>
+        <PuzzleWalletProvider
+          dAppName="zkSign"
+          dAppDescription="A zkSign app for Aleo"
+          dAppUrl="None"
+          dAppIconURL="None"
+        >
+          {children}
+        </PuzzleWalletProvider>
+      </WalletModalProvider>
     </WalletProvider>
   );
 };

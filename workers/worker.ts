@@ -1,54 +1,54 @@
 import {
   Account,
+  AleoKeyProvider,
+  AleoKeyProviderParams,
+  AleoNetworkClient,
   initThreadPool,
+  NetworkRecordProvider,
   PrivateKey,
   ProgramManager,
 } from "@provablehq/sdk";
 
-await initThreadPool();
+const defaultHost = "https://api.explorer.provable.com/v1";
 
-const hello_hello_program = `
-program hello_hello.aleo;
+// Create a key provider that will be used to find public proving & verifying keys for Aleo programs
+const keyProvider = new AleoKeyProvider();
+keyProvider.useCache(true);
 
-function hello:
-    input r0 as u32.public;
-    input r1 as u32.private;
-    add r0 r1 into r2;
-    output r2 as u32.private;`;
+// Define an account which will execute the transaction on-chain
+const account = new Account({ privateKey: "private_key" });
+const privateKeyObject = PrivateKey.from_string("private_key");
 
-async function localProgramExecution(
-  program: string,
-  aleoFunction: string,
-  inputs: string[]
-) {
-  const programManager = new ProgramManager();
+// Create a record provider that will be used to find records and transaction data for Aleo programs
+const networkClient = new AleoNetworkClient(defaultHost);
+const recordProvider = new NetworkRecordProvider(account, networkClient);
 
-  // Create a temporary account for the execution of the program
-  const account = new Account();
-  programManager.setAccount(account);
+// Initialize a program manager to talk to the Aleo network with the configured key and record providers
+const programManager = new ProgramManager(
+  defaultHost,
+  keyProvider,
+  recordProvider
+);
+programManager.setHost(defaultHost);
+programManager.setAccount(account);
 
-  const executionResponse = await programManager.run(
-    program,
-    aleoFunction,
-    inputs,
-    false
-  );
-  return executionResponse.getOutputs();
-}
+const programName = "zksignaleov1.aleo";
+const programId = "zksignaleov1";
+const aleoFunction = "create_document";
 
-function getPrivateKey() {
-  return new PrivateKey().to_string();
-}
+const cacheKey = `${programId}:${aleoFunction}`;
+const keySearchParams = new AleoKeyProviderParams({ cacheKey: cacheKey });
 
-onmessage = async function (e) {
-  if (e.data === "execute") {
-    const result = await localProgramExecution(hello_hello_program, "hello", [
-      "5u32",
-      "5u32",
-    ]);
-    postMessage({ type: "execute", result: result });
-  } else if (e.data === "key") {
-    const result = getPrivateKey();
-    postMessage({ type: "key", result: result });
-  }
-};
+// Build and execute the transaction
+const transaction = await programManager.execute({
+  programName,
+  functionName: aleoFunction,
+  fee: 0.02,
+  privateFee: false,
+  inputs: ["5u32", "5u32"],
+  keySearchParams,
+});
+
+const result = await programManager.networkClient.submitTransaction(
+  transaction
+);

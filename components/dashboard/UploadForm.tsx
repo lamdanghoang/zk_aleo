@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/card";
 import { AlertCircle, Upload } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
+import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
+import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 
 interface FormData {
   publicKey: string;
@@ -33,6 +36,10 @@ export default function ContractUploadForm() {
   });
   const [base64Result, setBase64Result] = useState<string>("");
   const [isError, setIsError] = useState<boolean | undefined>(undefined);
+  const { publicKey, connected, requestTransaction } = useWallet();
+  const [transitionId, setTransitionId] = useState<string | undefined>(
+    undefined
+  );
 
   const uploadData = async (formData: FormData) => {
     try {
@@ -83,6 +90,30 @@ export default function ContractUploadForm() {
     }
   };
 
+  const submitTransaction = async (address: string) => {
+    if (!publicKey || !requestTransaction) {
+      console.log("Undefine key aleo");
+      return;
+    }
+
+    const fee = 350_000;
+    let inputs = [address, "2411u128"];
+    const aleoTransaction = Transaction.createTransaction(
+      publicKey,
+      WalletAdapterNetwork.TestnetBeta,
+      "zksignaleov1.aleo",
+      "create_document",
+      inputs,
+      fee,
+      false
+    );
+    const txid = await requestTransaction(aleoTransaction);
+    if (txid) {
+      console.log(txid);
+      setTransitionId(txid);
+    }
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
@@ -91,6 +122,8 @@ export default function ContractUploadForm() {
       console.log("Cannot submit");
       return;
     }
+
+    submitTransaction(formData.publicKey);
     uploadData(formData);
 
     // Reset form after submission
@@ -197,12 +230,17 @@ export default function ContractUploadForm() {
             </CardFooter>
           </form>
         </Card>
-        {isError === false && (
-          <Alert className="flex justify-between items-center">
-            <AlertTitle>Your submission is complete !</AlertTitle>
+        {isError === false && transitionId && (
+          <Alert className="flex justify-between items-center bg-green-600">
+            <div className="space-y-2 text-gray-100">
+              <AlertTitle className="font-semibold">
+                Your submission is successful !
+              </AlertTitle>
+              <AlertDescription>Transition ID: {transitionId}</AlertDescription>
+            </div>
             <button
               onClick={() => setIsError(undefined)}
-              className="p-2 hover:bg-gray-100 rounded-full"
+              className="p-2 w-10 bg-gray-100 rounded-full"
             >
               ✕
             </button>
