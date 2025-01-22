@@ -4,9 +4,7 @@
 import {
   AlertCircle,
   DollarSignIcon,
-  FileUp,
   FingerprintIcon,
-  SignatureIcon,
   Wallet,
   WalletCardsIcon,
 } from "lucide-react";
@@ -18,39 +16,68 @@ import UploadForm from "@/components/dashboard/UploadForm";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import IpfsDocumentViewer from "@/components/ipfsviewer/IpfsDocumentViewer";
 import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
-
 import {
   Transaction,
   WalletAdapterNetwork,
-  WalletNotConnectedError,
 } from "@demox-labs/aleo-wallet-adapter-base";
-import { useBalance } from "@puzzlehq/sdk";
+import { useEffect, useState } from "react";
+import { AleoNetworkClient } from "@provablehq/sdk";
 
 export default function Dashboard() {
   const { publicKey, connected, requestTransaction } = useWallet();
+  const [balance, setBalance] = useState<string>("0");
 
-  const handleSign = async (e: any) => {
-    if (!publicKey || !requestTransaction) {
-      console.log("Undefine key aleo");
-      return;
-    }
+  useEffect(() => {
+    const getBalance = async () => {
+      const networkClient = new AleoNetworkClient(
+        "https://api.explorer.provable.com/v1"
+      );
 
-    const fee = 350_000;
-    let inputs = [
-      "aleo10qwt04dklqyclh9wfqj76npzckfv6lvvpad20rta0gjlvdlxgq8sf07d6x",
-      "2411u128",
-    ];
-    const aleoTransaction = Transaction.createTransaction(
-      publicKey,
-      WalletAdapterNetwork.TestnetBeta,
-      "zksignaleov1.aleo",
-      "create_document",
-      inputs,
-      fee,
-      false
-    );
-    const txid = await requestTransaction(aleoTransaction);
-    console.log(txid);
+      if (publicKey) {
+        const public_balance = await networkClient.getProgramMappingValue(
+          "credits.aleo",
+          "account",
+          publicKey
+        );
+        if (public_balance) {
+          const formatted_balance = public_balance.split("u")[0];
+          setBalance(formatted_balance);
+        }
+      }
+    };
+
+    getBalance();
+  }, [publicKey]);
+
+  const clickHandler = () => {
+    const handleSign = async () => {
+      if (!publicKey || !requestTransaction) {
+        console.log("Undefine key aleo");
+        return;
+      }
+
+      const fee = 350_000;
+      const inputs = [
+        "aleo10qwt04dklqyclh9wfqj76npzckfv6lvvpad20rta0gjlvdlxgq8sf07d6x",
+        "2411u128",
+      ];
+      const aleoTransaction = Transaction.createTransaction(
+        publicKey,
+        WalletAdapterNetwork.TestnetBeta,
+        "zksignaleov1.aleo",
+        "create_document",
+        inputs,
+        fee,
+        false
+      );
+      const txid = await requestTransaction(aleoTransaction);
+      if (txid) {
+        console.log(txid);
+      } else {
+        return;
+      }
+    };
+    handleSign();
   };
 
   return (
@@ -79,7 +106,7 @@ export default function Dashboard() {
               <div>
                 <h2 className="font-semibold text-xs sm:text-base">ALEO</h2>
                 <p className="text-base sm:text-xl">
-                  {connected ? "10" : "N/A"}
+                  {connected ? +balance / 1_000_000 : "N/A"}
                 </p>
               </div>
             </div>
@@ -109,7 +136,7 @@ export default function Dashboard() {
           </AlertDescription>
         </div>
         <Button
-          onClick={handleSign}
+          onClick={clickHandler}
           variant="destructive"
           size="sm"
           className="w-full sm:w-auto"

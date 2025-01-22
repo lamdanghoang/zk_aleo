@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  connect,
-  disconnect,
-  GetSelectedAccountResponse,
-  useAccount,
-  useConnect,
-} from "@puzzlehq/sdk";
+import { connect, disconnect, useAccount, useConnect } from "@puzzlehq/sdk";
 import {
   Popover,
   PopoverContent,
@@ -20,8 +14,8 @@ import { useRouter } from "next/navigation";
 export default function ConnectWalletButton() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { isConnected, data } = useConnect();
-  const { account, loading } = useAccount();
+  const { isConnected } = useConnect();
+  const { account } = useAccount();
   const [copySuccess, setCopySuccess] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
   const router = useRouter();
@@ -53,6 +47,7 @@ export default function ConnectWalletButton() {
       } catch (err) {
         console.error("Failed to copy address:", err);
         setError("Failed to copy address to clipboard.");
+        console.log(error);
       }
     }
   };

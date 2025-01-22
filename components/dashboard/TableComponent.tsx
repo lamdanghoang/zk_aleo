@@ -1,3 +1,4 @@
+"use client";
 import {
   Table,
   TableBody,
@@ -11,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
+import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
+import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
 
 interface TableProps {
   data?: {
@@ -23,7 +26,30 @@ interface TableProps {
 export default function TableComponent({ data = [] }: TableProps) {
   const [selectedRow, setSelectedRow] = useState<(typeof data)[0] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { connected } = useWallet();
+  const { connected, publicKey, requestTransaction } = useWallet();
+
+  const submitTransaction = async (address: string | null) => {
+    if (!publicKey || !requestTransaction) {
+      console.log("Undefine key aleo");
+      return;
+    }
+
+    const fee = 350_000;
+    const inputs = [address, "2411u128"];
+    const aleoTransaction = Transaction.createTransaction(
+      publicKey,
+      WalletAdapterNetwork.TestnetBeta,
+      "zksignaleov1.aleo",
+      "create_document",
+      inputs,
+      fee,
+      false
+    );
+    const txid = await requestTransaction(aleoTransaction);
+    if (txid) {
+      console.log(txid);
+    }
+  };
 
   return (
     <div className="px-5">
@@ -33,6 +59,7 @@ export default function TableComponent({ data = [] }: TableProps) {
             <TableHead className="font-bold text-lg">NFD ID</TableHead>
             <TableHead className="font-bold text-lg">eContract Name</TableHead>
             <TableHead className="font-bold text-lg">Creation Date</TableHead>
+            <TableHead className="font-bold text-lg"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -42,14 +69,36 @@ export default function TableComponent({ data = [] }: TableProps) {
               <TableRow
                 key={index}
                 className="cursor-pointer hover:bg-gray-100"
-                onClick={() => {
-                  setSelectedRow(row);
-                  setIsModalOpen(true);
-                }}
               >
-                <TableCell>{row.nfdId}</TableCell>
-                <TableCell>{row.eContractName}</TableCell>
-                <TableCell>{row.creationDate}</TableCell>
+                <TableCell
+                  onClick={() => {
+                    setSelectedRow(row);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  {row.nfdId}
+                </TableCell>
+                <TableCell
+                  onClick={() => {
+                    setSelectedRow(row);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  {row.eContractName}
+                </TableCell>
+                <TableCell
+                  onClick={() => {
+                    setSelectedRow(row);
+                    setIsModalOpen(true);
+                  }}
+                >
+                  {row.creationDate}
+                </TableCell>
+                <TableCell>
+                  <Button onClick={() => submitTransaction(publicKey)}>
+                    Sign
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           {!connected && (

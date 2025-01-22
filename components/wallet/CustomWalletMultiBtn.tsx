@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import {
   useWalletModal,
   WalletConnectButton,
-  WalletIcon,
   WalletModalButton,
 } from "@demox-labs/aleo-wallet-adapter-reactui";
 import { useRouter } from "next/navigation";
@@ -90,7 +89,7 @@ export const WalletMultiButton: FC<ButtonProps> = ({ children, ...props }) => {
           width: "120px",
         }}
         onClick={openDropdown}
-        startIcon={<WalletIcon wallet={wallet} />}
+        // startIcon={<WalletIcon wallet={wallet} />}
         {...props}
       >
         {content}
