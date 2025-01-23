@@ -10,11 +10,11 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
 import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
 import { Badge } from "@/components/ui/badge";
+import ImageViewer from "../ipfsviewer/ImageViewer";
 
 interface TableProps {
   data?: {
@@ -161,7 +161,7 @@ export default function TableComponent({ data = [] }: TableProps) {
             >
               ✕
             </button>
-            <IpfsImageViewer
+            <ImageViewer
               cid={selectedRow.cid}
               onClose={() => setIsModalOpen(false)}
             />

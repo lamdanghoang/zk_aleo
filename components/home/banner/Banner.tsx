@@ -2,13 +2,11 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
-import {
-  DecryptPermission,
-  WalletAdapterNetwork,
-} from "@demox-labs/aleo-wallet-adapter-base";
+import { useRouter } from "next/navigation";
 
 export default function Banner() {
+  const router = useRouter();
+
   return (
     <div className="w-full py-10 md:py-20 bg-white rounded-xl px-4 md:px-0">
       <div className="flex flex-col md:flex-row justify-evenly items-center gap-8 md:gap-0">
@@ -24,6 +22,7 @@ export default function Banner() {
             <Button
               variant="default"
               className="button text-white hover:bg-black/90 rounded-xl text-base"
+              onClick={() => router.push("/dashboard")}
             >
               Try it now!
             </Button>
