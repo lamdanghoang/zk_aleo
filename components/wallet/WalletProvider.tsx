@@ -8,7 +8,7 @@ import {
   WalletAdapterNetwork,
 } from "@demox-labs/aleo-wallet-adapter-base";
 import "./styles.css";
-// import { PuzzleWalletProvider } from "@puzzlehq/sdk";
+import { Toaster } from "@/components/ui/sonner";
 
 interface Props {
   children: React.ReactNode;
@@ -41,6 +41,7 @@ export const Wallet: React.FC<Props> = ({ children }) => {
         {children}
         {/* </PuzzleWalletProvider> */}
       </WalletModalProvider>
+      <Toaster />
     </WalletProvider>
   );
 };

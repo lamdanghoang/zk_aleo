@@ -15,6 +15,7 @@ import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
 import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
 import { Badge } from "@/components/ui/badge";
 import ImageViewer from "../ipfsviewer/ImageViewer";
+import { toast } from "sonner";
 
 interface TableProps {
   data?: {
@@ -50,6 +51,13 @@ export default function TableComponent({ data = [] }: TableProps) {
     const txid = await requestTransaction(aleoTransaction);
     if (txid) {
       console.log(txid);
+      toast("You signed successfully!", {
+        description: `Transition ID: ${txid}`,
+        action: {
+          label: "x",
+          onClick: () => console.log("Close"),
+        },
+      });
     }
   };
 
