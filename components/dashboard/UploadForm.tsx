@@ -97,11 +97,16 @@ export default function ContractUploadForm() {
     }
 
     const fee = 350_000;
-    let inputs = [address, "2411u128"];
+    let inputs = [
+      address,
+      "2411u128",
+      "{ part0: 0u128, part1: 0u128, part2: 0u128, part3: 0u128 }",
+      "123field",
+    ];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
       WalletAdapterNetwork.TestnetBeta,
-      "zksignaleov1.aleo",
+      "zksignaleov3.aleo",
       "create_document",
       inputs,
       fee,

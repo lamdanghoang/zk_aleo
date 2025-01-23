@@ -14,12 +14,14 @@ import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
 import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
+import { Badge } from "@/components/ui/badge";
 
 interface TableProps {
   data?: {
-    nfdId: string;
-    eContractName: string;
-    creationDate: string;
+    id: string;
+    viewkey: string;
+    cid: string;
+    signed_status: number;
   }[];
 }
 
@@ -28,19 +30,19 @@ export default function TableComponent({ data = [] }: TableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { connected, publicKey, requestTransaction } = useWallet();
 
-  const submitTransaction = async (address: string | null) => {
-    if (!publicKey || !requestTransaction) {
+  const signDocument = async (address: string | null) => {
+    if (!publicKey || !requestTransaction || !address) {
       console.log("Undefine key aleo");
       return;
     }
 
     const fee = 350_000;
-    const inputs = [address, "2411u128"];
+    const inputs = ["123field", "123field", "10u8"];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
       WalletAdapterNetwork.TestnetBeta,
-      "zksignaleov1.aleo",
-      "create_document",
+      "zksignaleov3.aleo",
+      "sign",
       inputs,
       fee,
       false
@@ -51,6 +53,26 @@ export default function TableComponent({ data = [] }: TableProps) {
     }
   };
 
+  const signAndUpdateDB = async (cid: string) => {
+    try {
+      if (!cid) return;
+      const obj = { cid };
+      const response = await fetch("https://zksign-dev.vercel.app/sign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      });
+
+      const result = await response.json();
+
+      console.log(result);
+    } catch (err) {
+      console.error("Error update DB:", err);
+    }
+  };
+
   return (
     <div className="px-5">
       <Table>
@@ -58,7 +80,7 @@ export default function TableComponent({ data = [] }: TableProps) {
           <TableRow className="hover:bg-transparent">
             <TableHead className="font-bold text-lg">NFD ID</TableHead>
             <TableHead className="font-bold text-lg">eContract Name</TableHead>
-            <TableHead className="font-bold text-lg">Creation Date</TableHead>
+            <TableHead className="font-bold text-lg">Status</TableHead>
             <TableHead className="font-bold text-lg"></TableHead>
           </TableRow>
         </TableHeader>
@@ -76,7 +98,7 @@ export default function TableComponent({ data = [] }: TableProps) {
                     setIsModalOpen(true);
                   }}
                 >
-                  {row.nfdId}
+                  {row.cid}
                 </TableCell>
                 <TableCell
                   onClick={() => {
@@ -84,7 +106,7 @@ export default function TableComponent({ data = [] }: TableProps) {
                     setIsModalOpen(true);
                   }}
                 >
-                  {row.eContractName}
+                  My contract {index + 1}
                 </TableCell>
                 <TableCell
                   onClick={() => {
@@ -92,10 +114,20 @@ export default function TableComponent({ data = [] }: TableProps) {
                     setIsModalOpen(true);
                   }}
                 >
-                  {row.creationDate}
+                  {row.signed_status === 0 ? (
+                    <Badge variant="destructive">Not signed</Badge>
+                  ) : (
+                    <Badge className="bg-green-500">Signed</Badge>
+                  )}
                 </TableCell>
                 <TableCell>
-                  <Button onClick={() => submitTransaction(publicKey)}>
+                  <Button
+                    onClick={() => {
+                      signDocument(publicKey);
+                      signAndUpdateDB(row.cid);
+                    }}
+                    disabled={row.signed_status === 1}
+                  >
                     Sign
                   </Button>
                 </TableCell>
@@ -104,7 +136,7 @@ export default function TableComponent({ data = [] }: TableProps) {
           {!connected && (
             <TableRow>
               <TableCell
-                colSpan={3}
+                colSpan={5}
                 className="text-center font-semibold text-lg"
               >
                 No Data
@@ -130,7 +162,7 @@ export default function TableComponent({ data = [] }: TableProps) {
               ✕
             </button>
             <IpfsImageViewer
-              cid={selectedRow.nfdId}
+              cid={selectedRow.cid}
               onClose={() => setIsModalOpen(false)}
             />
           </div>
