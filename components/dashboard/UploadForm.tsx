@@ -82,26 +82,83 @@ export default function ContractUploadForm() {
     }
 
     try {
-      const base64 = await convertToBase64(file);
-      setBase64Result(base64);
-      setFormData((prev) => ({ ...prev, file, base64: base64 }));
+      const resizedBase64 = await resizeImage(file, 800, 800); // Resize to 800x800
+      setBase64Result(resizedBase64);
+      setFormData((prev) => ({ ...prev, file, base64: resizedBase64 }));
     } catch (err) {
       console.error("Error converting file:", err);
     }
   };
 
-  const submitTransaction = async (address: string) => {
+  // Function to resize the image
+  const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        img.src = event.target?.result as string;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate the new dimensions
+        if (width > height) {
+          if (width > maxWidth) {
+            height *= maxWidth / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width *= maxHeight / height;
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Check the size of the image and adjust quality if necessary
+        let base64 = canvas.toDataURL(file.type, 1); // Start with full quality
+        while (base64.length > 1e4) { // 1MB in bytes
+          const quality = parseFloat((1 - (base64.length / 1e4)).toFixed(2)); // Reduce quality
+          base64 = canvas.toDataURL(file.type, quality);
+        }
+
+        resolve(base64.split(",")[1]); // Return only the base64 part
+      };
+
+      img.onerror = (error) => reject(error);
+      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const generateRandomNumber = (seed: string) => {
+    const hash = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return Math.floor(Math.random() * hash);
+  };
+
+  const submitTransaction = async (address: string, randomNumbers: any) => {
     if (!publicKey || !requestTransaction) {
       console.log("Undefine key aleo");
       return;
     }
 
+    let view_id = generateRandomNumber(address)
+
     const fee = 350_000;
     let inputs = [
       address,
       "2411u128",
-      "{ part0: 0u128, part1: 0u128, part2: 0u128, part3: 0u128 }",
-      "123field",
+      `{ part0: ${randomNumbers[0]}u128, part1: ${randomNumbers[1]}u128, part2: ${randomNumbers[2]}u128, part3: ${randomNumbers[3]}u128 }`,
+      `${view_id}field`,
     ];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
@@ -119,6 +176,11 @@ export default function ContractUploadForm() {
     }
   };
 
+  const generateRandomNumbers = (base64: string): number[] => {
+    const hash = Array.from(base64).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return Array.from({ length: 4 }, () => Math.floor(Math.random() * hash));
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
@@ -128,7 +190,9 @@ export default function ContractUploadForm() {
       return;
     }
 
-    submitTransaction(formData.publicKey);
+    const randomNumbers = generateRandomNumbers(formData.base64);
+
+    submitTransaction(formData.publicKey, randomNumbers);
     uploadData(formData);
 
     // Reset form after submission
@@ -266,17 +330,3 @@ export default function ContractUploadForm() {
     </div>
   );
 }
-
-const convertToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
-      const base64 = result.split(",")[1];
-      resolve(base64);
-    };
-    reader.onerror = (error) => reject(error);
-    reader.readAsDataURL(file);
-  });
-};
