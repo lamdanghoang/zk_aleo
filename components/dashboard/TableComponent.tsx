@@ -31,14 +31,20 @@ export default function TableComponent({ data = [] }: TableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { connected, publicKey, requestTransaction } = useWallet();
 
+  const generateRandomNumber = (seed: string) => {
+    const hash = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return Math.floor(Math.random() * hash);
+  };
+
   const signDocument = async (address: string | null) => {
     if (!publicKey || !requestTransaction || !address) {
       console.log("Undefine key aleo");
       return;
     }
 
+    const randomNumber = generateRandomNumber(publicKey);
     const fee = 3500;
-    const inputs = ["123field", "123field", "10u8"];
+    const inputs = ["123field", `${randomNumber}field`, "10u8"];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
       WalletAdapterNetwork.TestnetBeta,
