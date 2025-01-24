@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 import {
   AlertCircle,
   DollarSignIcon,
@@ -16,34 +17,22 @@ import {
   Transaction,
   WalletAdapterNetwork,
 } from "@demox-labs/aleo-wallet-adapter-base";
-import { useEffect, useState } from "react";
-import { AleoNetworkClient } from "@provablehq/sdk";
+import { useState, useEffect } from "react";
+// import { getBalance } from "@/lib/helper_func";
 
 export default function Dashboard() {
   const { publicKey, connected, requestTransaction } = useWallet();
   const [balance, setBalance] = useState<string>("0");
 
-  useEffect(() => {
-    const getBalance = async () => {
-      const networkClient = new AleoNetworkClient(
-        "https://api.explorer.provable.com/v1"
-      );
+  // useEffect(() => {
+  //   const fetchBalance = async () => {
+  //     const value = await getBalance(publicKey);
+  //     setBalance(value);
+  //     console.log(value);
+  //   };
 
-      if (publicKey) {
-        const public_balance = await networkClient.getProgramMappingValue(
-          "credits.aleo",
-          "account",
-          publicKey
-        );
-        if (public_balance) {
-          const formatted_balance = public_balance.split("u")[0];
-          setBalance(formatted_balance);
-        }
-      }
-    };
-
-    getBalance();
-  }, [publicKey]);
+  //   fetchBalance();
+  // }, [publicKey]);
 
   const clickHandler = () => {
     const handleSign = async () => {

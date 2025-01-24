@@ -1,4 +1,6 @@
+"use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface IpfsImageViewerProps {
@@ -34,7 +36,7 @@ const ImageViewer: React.FC<IpfsImageViewerProps> = ({ cid }) => {
         URL.revokeObjectURL(imageUrl);
       }
     };
-  }, [cid]);
+  }, [cid, imageUrl]);
 
   if (error) {
     return (
@@ -49,7 +51,7 @@ const ImageViewer: React.FC<IpfsImageViewerProps> = ({ cid }) => {
       <CardContent className="p-6">
         <div className="relative w-full aspect-video">
           {imageUrl ? (
-            <img
+            <Image
               src={imageUrl}
               alt="IPFS content"
               className="object-contain w-full h-full"

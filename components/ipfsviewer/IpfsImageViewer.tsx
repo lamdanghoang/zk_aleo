@@ -5,6 +5,7 @@ import { createHelia } from "helia";
 import { unixfs } from "@helia/unixfs";
 import { Card, CardContent } from "@/components/ui/card";
 import { CID } from "multiformats/cid";
+import Image from "next/image";
 
 interface IpfsImageViewerProps {
   cid: string;
@@ -103,7 +104,7 @@ const IpfsImageViewer: React.FC<IpfsImageViewerProps> = ({ cid }) => {
       <CardContent className="p-6">
         {imageUrl && (
           <div className="relative w-full aspect-video">
-            <img
+            <Image
               src={imageUrl}
               alt="IPFS content"
               className="object-contain w-full h-full"
