@@ -1,6 +1,4 @@
 "use client";
-/* eslint-disable */
-
 import {
   AlertCircle,
   DollarSignIcon,
@@ -14,8 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import History from "@/components/dashboard/HistoryTable";
 import UploadForm from "@/components/dashboard/UploadForm";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
-import IpfsDocumentViewer from "@/components/ipfsviewer/IpfsDocumentViewer";
-import IpfsImageViewer from "@/components/ipfsviewer/IpfsImageViewer";
 import {
   Transaction,
   WalletAdapterNetwork,
