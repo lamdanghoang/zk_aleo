@@ -51,7 +51,7 @@ export default function ContractUploadForm() {
         },
         body: JSON.stringify({
           file: formData.base64,
-          viewkey: formData.viewKey,
+          viewkey: formData.publicKey,
         }),
       });
 

@@ -37,7 +37,7 @@ export default function TableComponent({ data = [] }: TableProps) {
       return;
     }
 
-    const fee = 350_000;
+    const fee = 3500;
     const inputs = ["123field", "123field", "10u8"];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
