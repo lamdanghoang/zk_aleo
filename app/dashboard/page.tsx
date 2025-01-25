@@ -109,7 +109,7 @@ export default function Dashboard() {
       </Card>
 
       {/* Notification */}
-      <Alert
+      {/* <Alert
         variant="destructive"
         className="flex flex-col sm:flex-row items-center gap-4 sm:gap-2 sm:justify-between bg-card p-4"
       >
@@ -128,7 +128,7 @@ export default function Dashboard() {
         >
           OPT-IN
         </Button>
-      </Alert>
+      </Alert> */}
 
       {/* Upload Contract */}
       <UploadForm />

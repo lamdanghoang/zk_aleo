@@ -32,7 +32,10 @@ export default function TableComponent({ data = [] }: TableProps) {
   const { connected, publicKey, requestTransaction } = useWallet();
 
   const generateRandomNumber = (seed: string) => {
-    const hash = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = Array.from(seed).reduce(
+      (acc, char) => acc + char.charCodeAt(0),
+      0
+    );
     return Math.floor(Math.random() * hash);
   };
 
@@ -183,15 +186,17 @@ export default function TableComponent({ data = [] }: TableProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-center gap-4 p-4 border-t">
-        <Button variant="ghost" size="icon" disabled>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span>1</span>
-        <Button variant="ghost" size="icon" disabled>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      {data.length !== 0 && (
+        <div className="flex items-center justify-center gap-4 p-4 border-t">
+          <Button variant="ghost" size="icon" disabled>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <span>1</span>
+          <Button variant="ghost" size="icon" disabled>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
