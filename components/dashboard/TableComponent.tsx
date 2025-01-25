@@ -46,7 +46,7 @@ export default function TableComponent({ data = [] }: TableProps) {
     }
 
     const randomNumber = generateRandomNumber(publicKey);
-    const fee = 3500;
+    const fee = 350_000;
     const inputs = ["123field", `${randomNumber}field`, "10u8"];
     const aleoTransaction = Transaction.createTransaction(
       publicKey,
