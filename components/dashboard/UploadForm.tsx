@@ -224,7 +224,7 @@ export default function ContractUploadForm() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="publicKey" className="text-base">
-                  Public Key <span className="text-red-500">*</span>
+                  Sender Public Key <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="publicKey"
@@ -237,7 +237,7 @@ export default function ContractUploadForm() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="viewKey" className="text-base">
-                  View Key <span className="text-red-500">*</span>
+                  Receiver Public Key <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="viewKey"
