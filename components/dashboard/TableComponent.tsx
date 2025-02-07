@@ -102,8 +102,16 @@ export default function TableComponent({ data = [] }: TableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {connected &&
-            data.length > 0 &&
+          {!connected || data.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                className="text-center font-semibold text-lg"
+              >
+                No Data
+              </TableCell>
+            </TableRow>
+          ) : (
             data.map((row, index) => (
               <TableRow
                 key={index}
@@ -149,16 +157,7 @@ export default function TableComponent({ data = [] }: TableProps) {
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
-          {!connected && (
-            <TableRow>
-              <TableCell
-                colSpan={5}
-                className="text-center font-semibold text-lg"
-              >
-                No Data
-              </TableCell>
-            </TableRow>
+            ))
           )}
         </TableBody>
       </Table>
