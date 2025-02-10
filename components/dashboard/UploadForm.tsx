@@ -2,7 +2,7 @@
 /* eslint-disable */
 
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import { FileUp } from "lucide-react";
+import { FileUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,52 +20,49 @@ import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
 import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 
+interface FileData {
+  file: File;
+  base64: string;
+}
+
 interface FormData {
   publicKey: string;
   viewKey: string;
-  file: File | null;
-  base64: string;
+  files: FileData[];
 }
 
 export default function ContractUploadForm() {
   const [formData, setFormData] = useState<FormData>({
     publicKey: "",
     viewKey: "",
-    file: null,
-    base64: "",
+    files: [],
   });
-  const [base64Result, setBase64Result] = useState<string>("");
   const [isError, setIsError] = useState<boolean | undefined>(undefined);
   const { publicKey, connected, requestTransaction } = useWallet();
   const [transitionId, setTransitionId] = useState<string | undefined>(
     undefined
   );
+  const [uploading, setUploading] = useState(false);
 
-  const uploadData = async (formData: FormData) => {
-    try {
-      const response = await fetch("https://zksign-dev.vercel.app/upload", {
+  const uploadData = async (files: FileData[], viewKey: string) => {
+    const uploadPromises = files.map(({ base64 }) =>
+      fetch("https://zksign-dev.vercel.app/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
         },
-        body: JSON.stringify({
-          file: formData.base64,
-          viewkey: formData.viewKey,
-        }),
-      });
+        body: JSON.stringify({ file: base64, viewkey: viewKey }),
+      })
+    );
 
-      if (!response.ok) {
-        setIsError(true);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Upload successful:", data);
+    try {
+      const responses = await Promise.all(uploadPromises);
+      const results = await Promise.all(responses.map((r) => r.json()));
       setIsError(false);
-      return data;
+      return results;
     } catch (error) {
-      console.error("Error when uploading:", error);
+      setIsError(true);
       throw error;
     }
   };
@@ -76,22 +73,40 @@ export default function ContractUploadForm() {
   };
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    if (!file) {
-      return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const newFiles: FileData[] = [];
+    for (const file of files) {
+      try {
+        const base64 = await resizeImage(file, 800, 800);
+        newFiles.push({ file, base64 });
+      } catch (err) {
+        console.error(`Error processing file ${file.name}:`, err);
+      }
     }
 
-    try {
-      const resizedBase64 = await resizeImage(file, 800, 800); // Resize to 800x800
-      setBase64Result(resizedBase64);
-      setFormData((prev) => ({ ...prev, file, base64: resizedBase64 }));
-    } catch (err) {
-      console.error("Error converting file:", err);
-    }
+    setFormData((prev) => ({
+      ...prev,
+      files: [...prev.files, ...newFiles],
+    }));
   };
 
-  // Function to resize the image
-  const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<string> => {
+  const resizeImage = async (
+    file: File,
+    maxWidth: number,
+    maxHeight: number
+  ): Promise<string> => {
+    if (!file.type.startsWith("image/")) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () =>
+          resolve(reader.result?.toString().split(",")[1] || "");
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     return new Promise((resolve, reject) => {
       const img = new Image();
       const reader = new FileReader();
@@ -107,7 +122,6 @@ export default function ContractUploadForm() {
         let width = img.width;
         let height = img.height;
 
-        // Calculate the new dimensions
         if (width > height) {
           if (width > maxWidth) {
             height *= maxWidth / width;
@@ -124,24 +138,33 @@ export default function ContractUploadForm() {
         canvas.height = height;
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Check the size of the image and adjust quality if necessary
-        let base64 = canvas.toDataURL(file.type, 1); // Start with full quality
-        while (base64.length > 1e4) { // 1MB in bytes
-          const quality = parseFloat((1 - (base64.length / 1e4)).toFixed(2)); // Reduce quality
+        let base64 = canvas.toDataURL(file.type, 1);
+        while (base64.length > 1e6) {
+          const quality = parseFloat((1 - base64.length / 1e6).toFixed(2));
           base64 = canvas.toDataURL(file.type, quality);
         }
 
-        resolve(base64.split(",")[1]); // Return only the base64 part
+        resolve(base64.split(",")[1]);
       };
 
-      img.onerror = (error) => reject(error);
-      reader.onerror = (error) => reject(error);
+      img.onerror = reject;
+      reader.onerror = reject;
       reader.readAsDataURL(file);
     });
   };
 
+  const removeFile = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      files: prev.files.filter((_, i) => i !== index),
+    }));
+  };
+
   const generateRandomNumber = (seed: string) => {
-    const hash = Array.from(seed).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = Array.from(seed).reduce(
+      (acc, char) => acc + char.charCodeAt(0),
+      0
+    );
     return Math.floor(Math.random() * hash);
   };
 
@@ -151,7 +174,7 @@ export default function ContractUploadForm() {
       return;
     }
 
-    let view_id = generateRandomNumber(address)
+    let view_id = generateRandomNumber(address);
 
     const fee = 350_000;
     let inputs = [
@@ -177,31 +200,36 @@ export default function ContractUploadForm() {
   };
 
   const generateRandomNumbers = (base64: string): number[] => {
-    const hash = Array.from(base64).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const hash = Array.from(base64).reduce(
+      (acc, char) => acc + char.charCodeAt(0),
+      0
+    );
     return Array.from({ length: 4 }, () => Math.floor(Math.random() * hash));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Form submitted", formData);
-    if (!formData.viewKey || !formData.base64) {
-      console.log("Cannot submit");
-      return;
+    if (!formData.viewKey || formData.files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const uploadResults = await uploadData(formData.files, formData.viewKey);
+
+      for (const file of formData.files) {
+        const randomNumbers = generateRandomNumbers(file.base64);
+        await submitTransaction(formData.publicKey, randomNumbers);
+      }
+
+      setFormData({
+        publicKey: "",
+        viewKey: "",
+        files: [],
+      });
+    } catch (error) {
+      console.error("Submission error:", error);
+    } finally {
+      setUploading(false);
     }
-
-    const randomNumbers = generateRandomNumbers(formData.base64);
-
-    submitTransaction(formData.publicKey, randomNumbers);
-    uploadData(formData);
-
-    // Reset form after submission
-    setFormData({
-      publicKey: "",
-      viewKey: "",
-      file: null,
-      base64: "",
-    });
   };
 
   return (
@@ -280,21 +308,39 @@ export default function ContractUploadForm() {
                     />
                   </label>
                 </div>
-                {formData.file && (
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>File selected</AlertTitle>
-                    <AlertDescription>
-                      {formData.file.name} (
-                      {(formData.file.size / 1024 / 1024).toFixed(2)} MB)
-                    </AlertDescription>
-                  </Alert>
+                {formData.files.length > 0 && (
+                  <div className="space-y-2">
+                    {formData.files.map((fileData, index) => (
+                      <Alert
+                        key={index}
+                        className="flex justify-between items-center"
+                      >
+                        <div>
+                          <AlertTitle>{fileData.file.name}</AlertTitle>
+                          <AlertDescription>
+                            {(fileData.file.size / 1024 / 1024).toFixed(2)} MB
+                          </AlertDescription>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeFile(index)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </Alert>
+                    ))}
+                  </div>
                 )}
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full button">
-                Submit
+              <Button
+                type="submit"
+                className="w-full button"
+                disabled={uploading || formData.files.length === 0}
+              >
+                {uploading ? "Uploading..." : "Submit"}
               </Button>
             </CardFooter>
           </form>
