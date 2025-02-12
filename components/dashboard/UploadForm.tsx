@@ -29,6 +29,7 @@ interface FormData {
   publicKey: string;
   viewKey: string;
   files: FileData[];
+  base64s: string[];
 }
 
 export default function ContractUploadForm() {
@@ -36,33 +37,36 @@ export default function ContractUploadForm() {
     publicKey: "",
     viewKey: "",
     files: [],
+    base64s: [],
   });
   const [isError, setIsError] = useState<boolean | undefined>(undefined);
   const { publicKey, connected, requestTransaction } = useWallet();
-  const [transitionId, setTransitionId] = useState<string | undefined>(
-    undefined
-  );
+  const [transitionIds, setTransitionIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const uploadData = async (files: FileData[], viewKey: string) => {
-    const uploadPromises = files.map(({ base64 }) =>
-      fetch("https://zksign-dev.vercel.app/upload", {
+  const uploadData = async (formData: FormData) => {
+    try {
+      const response = await fetch("https://zksign-dev.vercel.app/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
         },
-        body: JSON.stringify({ file: base64, viewkey: viewKey }),
-      })
-    );
+        body: JSON.stringify({
+          files: formData.base64s,
+          viewkey: formData.viewKey,
+        }),
+      });
+      if (!response.ok) {
+        setIsError(true);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-    try {
-      const responses = await Promise.all(uploadPromises);
-      const results = await Promise.all(responses.map((r) => r.json()));
+      const data = await response.json();
+      console.log("Upload successful:", data);
       setIsError(false);
-      return results;
+      return data;
     } catch (error) {
-      setIsError(true);
+      console.error("Error when uploading:", error);
       throw error;
     }
   };
@@ -81,15 +85,16 @@ export default function ContractUploadForm() {
       try {
         const base64 = await resizeImage(file, 800, 800);
         newFiles.push({ file, base64 });
+
+        setFormData((prev) => ({
+          ...prev,
+          files: [...prev.files, ...newFiles],
+          base64s: [...prev.base64s, base64],
+        }));
       } catch (err) {
         console.error(`Error processing file ${file.name}:`, err);
       }
     }
-
-    setFormData((prev) => ({
-      ...prev,
-      files: [...prev.files, ...newFiles],
-    }));
   };
 
   const resizeImage = async (
@@ -195,7 +200,7 @@ export default function ContractUploadForm() {
     const txid = await requestTransaction(aleoTransaction);
     if (txid) {
       console.log(txid);
-      setTransitionId(txid);
+      setTransitionIds((prev) => [...prev, txid]);
     }
   };
 
@@ -213,7 +218,7 @@ export default function ContractUploadForm() {
 
     setUploading(true);
     try {
-      const uploadResults = await uploadData(formData.files, formData.viewKey);
+      const uploadResults = await uploadData(formData);
 
       for (const file of formData.files) {
         const randomNumbers = generateRandomNumbers(file.base64);
@@ -224,6 +229,7 @@ export default function ContractUploadForm() {
         publicKey: "",
         viewKey: "",
         files: [],
+        base64s: [],
       });
     } catch (error) {
       console.error("Submission error:", error);
@@ -304,6 +310,7 @@ export default function ContractUploadForm() {
                       className="hidden"
                       onChange={handleFileChange}
                       accept=".pdf,.doc,.docx,.png,.svg,.jpeg,.gif"
+                      multiple
                       required
                     />
                   </label>
@@ -345,13 +352,20 @@ export default function ContractUploadForm() {
             </CardFooter>
           </form>
         </Card>
-        {isError === false && transitionId && (
+        {isError === false && transitionIds.length > 0 && (
           <Alert className="flex justify-between items-center bg-green-600">
             <div className="space-y-2 text-gray-100">
               <AlertTitle className="font-semibold">
                 Your submission is successful !
               </AlertTitle>
-              <AlertDescription>Transition ID: {transitionId}</AlertDescription>
+              <AlertDescription>
+                Transition IDs:{" "}
+                <ol>
+                  {transitionIds.map((transitionId) => (
+                    <li key={transitionId}>{transitionId}</li>
+                  ))}
+                </ol>
+              </AlertDescription>
             </div>
             <button
               onClick={() => setIsError(undefined)}
