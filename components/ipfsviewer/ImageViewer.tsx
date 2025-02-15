@@ -55,6 +55,8 @@ const ImageViewer: React.FC<IpfsImageViewerProps> = ({ cid }) => {
               src={imageUrl}
               alt="IPFS content"
               className="object-contain w-full h-full"
+              width={800}
+              height={800}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

@@ -9,12 +9,10 @@ import {
 } from "@/components/ui/table";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { useWallet } from "@demox-labs/aleo-wallet-adapter-react";
 import { Transaction } from "@demox-labs/aleo-wallet-adapter-base";
 import { WalletAdapterNetwork } from "@demox-labs/aleo-wallet-adapter-base";
 import { Badge } from "@/components/ui/badge";
-import ImageViewer from "../ipfsviewer/ImageViewer";
 import { toast } from "sonner";
 
 interface TableProps {
@@ -27,8 +25,6 @@ interface TableProps {
 }
 
 export default function TableComponent({ data = [] }: TableProps) {
-  const [selectedRow, setSelectedRow] = useState<(typeof data)[0] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { connected, publicKey, requestTransaction } = useWallet();
 
   const generateRandomNumber = (seed: string) => {
@@ -90,6 +86,14 @@ export default function TableComponent({ data = [] }: TableProps) {
     }
   };
 
+  const openNewTab = (cid: string) => {
+    window.open(
+      `https://scared-blue-planarian.myfilebase.com/ipfs/${cid}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
   return (
     <div className="px-5">
       <Table>
@@ -117,28 +121,13 @@ export default function TableComponent({ data = [] }: TableProps) {
                 key={index}
                 className="cursor-pointer hover:bg-gray-100"
               >
-                <TableCell
-                  onClick={() => {
-                    setSelectedRow(row);
-                    setIsModalOpen(true);
-                  }}
-                >
+                <TableCell onClick={() => openNewTab(row.cid)}>
                   {row.cid}
                 </TableCell>
-                <TableCell
-                  onClick={() => {
-                    setSelectedRow(row);
-                    setIsModalOpen(true);
-                  }}
-                >
+                <TableCell onClick={() => openNewTab(row.cid)}>
                   My contract {index + 1}
                 </TableCell>
-                <TableCell
-                  onClick={() => {
-                    setSelectedRow(row);
-                    setIsModalOpen(true);
-                  }}
-                >
+                <TableCell onClick={() => openNewTab(row.cid)}>
                   {row.signed_status === 0 ? (
                     <Badge variant="destructive">Not signed</Badge>
                   ) : (
@@ -161,29 +150,6 @@ export default function TableComponent({ data = [] }: TableProps) {
           )}
         </TableBody>
       </Table>
-
-      {isModalOpen && selectedRow && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="bg-white p-4 rounded-lg max-w-3xl w-full mx-4 relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-2 right-2 p-2 hover:bg-gray-100 rounded-full"
-            >
-              ✕
-            </button>
-            <ImageViewer
-              cid={selectedRow.cid}
-              onClose={() => setIsModalOpen(false)}
-            />
-          </div>
-        </div>
-      )}
 
       {data.length !== 0 && (
         <div className="flex items-center justify-center gap-4 p-4 border-t">
