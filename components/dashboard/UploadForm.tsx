@@ -46,7 +46,7 @@ export default function ContractUploadForm() {
 
   const uploadData = async (formData: FormData) => {
     try {
-      const response = await fetch("https://zksign-dev.vercel.app/upload", {
+      const response = await fetch("https://zk-api.trackit-app.xyz/upload", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

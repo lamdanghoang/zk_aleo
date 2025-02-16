@@ -71,7 +71,7 @@ export default function TableComponent({ data = [] }: TableProps) {
     try {
       if (!cid) return;
       const obj = { cid };
-      const response = await fetch("https://zksign-dev.vercel.app/sign", {
+      const response = await fetch("https://zk-api.trackit-app.xyz/sign", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

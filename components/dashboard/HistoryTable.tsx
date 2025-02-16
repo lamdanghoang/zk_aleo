@@ -23,7 +23,7 @@ export default function History() {
       try {
         if (!publicKey) return;
         const response = await fetch(
-          `https://zksign-dev.vercel.app/documents?viewkey=${publicKey}`
+          `https://zk-api.trackit-app.xyz/documents?viewkey=${publicKey}`
         );
 
         const result = await response.json();
