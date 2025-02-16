@@ -35,7 +35,7 @@ export default function TableComponent({ data = [] }: TableProps) {
     return Math.floor(Math.random() * hash);
   };
 
-  const signDocument = async (address: string | null) => {
+  const signDocument = async (address: string | null, cid: string) => {
     if (!publicKey || !requestTransaction || !address) {
       console.log("Undefine key aleo");
       return;
@@ -63,6 +63,7 @@ export default function TableComponent({ data = [] }: TableProps) {
           onClick: () => console.log("Close"),
         },
       });
+      signAndUpdateDB(cid);
     }
   };
 
@@ -136,10 +137,7 @@ export default function TableComponent({ data = [] }: TableProps) {
                 </TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => {
-                      signDocument(publicKey);
-                      signAndUpdateDB(row.cid);
-                    }}
+                    onClick={() => signDocument(publicKey, row.cid)}
                     disabled={row.signed_status === 1}
                   >
                     Sign

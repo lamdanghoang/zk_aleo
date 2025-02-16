@@ -81,81 +81,42 @@ export default function ContractUploadForm() {
     if (files.length === 0) return;
 
     const newFiles: FileData[] = [];
+
+    const fileToBase64Promises = files.map((file) => {
+      return new Promise<{ file: File; base64: string }>((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          // Get the base64 string by removing the data URL prefix
+          const base64 = reader.result?.toString().split(",")[1] || "";
+          resolve({ file, base64 });
+        };
+
+        reader.onerror = (error) => {
+          console.error(`Error reading file ${file.name}:`, error);
+          reject(error);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    });
+
     for (const file of files) {
       try {
-        const base64 = await resizeImage(file, 800, 800);
-        newFiles.push({ file, base64 });
+        const results = await Promise.all(fileToBase64Promises);
+        for (const result of results) {
+          newFiles.push(result);
+        }
 
         setFormData((prev) => ({
           ...prev,
           files: [...prev.files, ...newFiles],
-          base64s: [...prev.base64s, base64],
+          base64s: [...prev.base64s, ...newFiles.map((f) => f.base64)],
         }));
       } catch (err) {
-        console.error(`Error processing file ${file.name}:`, err);
+        console.error("Error processing file: ", err);
       }
     }
-  };
-
-  const resizeImage = async (
-    file: File,
-    maxWidth: number,
-    maxHeight: number
-  ): Promise<string> => {
-    if (!file.type.startsWith("image/")) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () =>
-          resolve(reader.result?.toString().split(",")[1] || "");
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        img.src = event.target?.result as string;
-      };
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxWidth) {
-            height *= maxWidth / width;
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width *= maxHeight / height;
-            height = maxHeight;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        let base64 = canvas.toDataURL(file.type, 1);
-        while (base64.length > 1e6) {
-          const quality = parseFloat((1 - base64.length / 1e6).toFixed(2));
-          base64 = canvas.toDataURL(file.type, quality);
-        }
-
-        resolve(base64.split(",")[1]);
-      };
-
-      img.onerror = reject;
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   };
 
   const removeFile = (index: number) => {
@@ -218,12 +179,13 @@ export default function ContractUploadForm() {
 
     setUploading(true);
     try {
-      const uploadResults = await uploadData(formData);
-
       for (const file of formData.files) {
         const randomNumbers = generateRandomNumbers(file.base64);
         await submitTransaction(formData.publicKey, randomNumbers);
       }
+
+      const response = await uploadData(formData);
+      console.log(response);
 
       setFormData({
         publicKey: "",
